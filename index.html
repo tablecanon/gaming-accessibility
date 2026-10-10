@@ -267,7 +267,6 @@ footer.foot{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)
     <div style="flex:1;min-width:9rem"><label for="st-site">Site used</label><select id="st-site"><option>Prototype</option><option>GamingAccessibility.org</option></select></div>
   </div>
   <details id="st-scen" open><summary>Scenario to read aloud</summary><p id="st-scen-text" style="margin:.5rem 0 0"></p></details>
-  <div class="row"><button type="button" class="btn small" id="st-start">Start task</button></div>
   <form id="st-fb" class="stack" novalidate style="gap:.8rem;margin-top:.5rem">
     <h3 style="margin:0">After the task</h3>
     <div><label for="fb-fix">Which fix would you go with?</label><span class="hint">Its name, or "None".</span><input type="text" id="fb-fix" autocomplete="off"></div>
@@ -627,8 +626,6 @@ function scale(id,name){$(id).innerHTML=[1,2,3,4,5].map(n=>`<label class="opt"><
 scale('#fb-ease','fb-ease'); scale('#fb-conf','fb-conf');
 function showTask(){const k=$('#st-task').value, T=TASKS[k]; $('#st-scen-text').textContent='"'+T.scen+'"'; $('#fb-follow-l').textContent=T.q;}
 $('#st-task').addEventListener('change',showTask); showTask();
-$('#st-start').addEventListener('click',()=>{const m=$('#st-copy-msg'); if(!$('#st-code').value.trim()){m.textContent="Enter a participant code first."; $('#st-code').focus(); return}
-  log("task_start",{label:TASKS[$('#st-task').value].title+" on "+$('#st-site').value,site:$('#st-site').value}); m.textContent=TASKS[$('#st-task').value].title+" started on "+$('#st-site').value+".";});
 $('#st-fb').addEventListener('submit',async e=>{
   e.preventDefault(); const m=$('#st-copy-msg'); const code=$('#st-code').value.trim();
   if(!code){m.textContent="Enter a participant code first."; $('#st-code').focus(); return}
