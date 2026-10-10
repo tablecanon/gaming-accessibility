@@ -326,6 +326,14 @@ function sheetSend(items){const u=sheetUrl(); if(!u||!items.length) return false
   const body=JSON.stringify({key:SHEET_KEY,items});
   try{ if(navigator.sendBeacon && navigator.sendBeacon(u,new Blob([body],{type:"text/plain;charset=utf-8"}))) return true; }catch(e){}
   try{ fetch(u,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body,keepalive:true}); return true; }catch(e){ return false; } }
+async function sheetSendConfirmed(items){const u=sheetUrl(); if(!u) return "none";
+  const body=JSON.stringify({key:SHEET_KEY,items});
+  try{ const r=await fetch(u,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body}); const txt=((await r.text())||"").trim();
+    if(/^ok v2/.test(txt)) return "ok"; if(/^ok/.test(txt)) return "old"; if(/^ignored/.test(txt)) return "key"; return "other"; }
+  catch(e){ sheetSend(items); return "unconfirmed"; } }
+const SHEET_MSG={ok:"Saved to the Task feedback tab.",old:"Your sheet is still running the old script, so these answers were NOT added. In Apps Script: Deploy, Manage deployments, pencil on the existing deployment, Version: New version, Deploy. Your answers are kept in this browser.",
+  key:"Your sheet's script has a different key, so these answers were NOT added. Paste the latest collector file into Apps Script and deploy a new version.",
+  other:"The sheet address didn't answer like the collector script. Open it in a new tab to check it says the collector is running (v2).",unconfirmed:"Sent, but this page couldn't confirm it arrived. Check the Task feedback tab.",none:"No results sheet is connected, so answers stay in this browser."};
 function sheetQueueEvent(ev,code){ if(!sheetUrl()) return; sheetQueue.push({kind:"event",participant:code,...ev}); clearTimeout(sheetTimer); sheetTimer=setTimeout(()=>{const q=sheetQueue; sheetQueue=[]; sheetSend(q)},3000); }
 window.addEventListener("pagehide",()=>{ if(sheetQueue.length){sheetSend(sheetQueue); sheetQueue=[]} });
 function storeMsg(){ $('#st-store').textContent = sheetUrl() ? "Saving to your Google Sheet." + (db?" Also saving to this prototype's shared record.":"") : db ? "Saving to the shared study log for this prototype." : "Shared saving isn't available here, so the log stays in this browser. Use Copy to keep it, or connect a Google Sheet below."; }
@@ -593,8 +601,9 @@ $('#st-sheet-test').addEventListener('click',()=>{const m=$('#st-copy-msg'); if(
   const body=JSON.stringify({key:SHEET_KEY,items:[{kind:"event",participant:"TEST",t:new Date().toISOString(),task:"-",type:"connection_test",detail:{label:"Test row from the prototype"}}]});
   fetch(sheetUrl(),{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body}).then(r=>r.text()).then(txt=>{
     txt=(txt||"").trim();
-    if(txt==="ok") m.textContent="Connected. A test row was added to the Events tab at the bottom of your sheet.";
-    else if(txt==="ignored") m.textContent="Your script answered but ignored the row: its key doesn't match this page. Paste the whole collector file into Apps Script again, then Deploy, Manage deployments, edit, New version.";
+    if(/^ok v2/.test(txt)) m.textContent="Connected to the current script (v2). A test row was added to the Events tab at the bottom of your sheet.";
+    else if(txt==="ok") m.textContent="Connected, but your sheet is running the OLD script, which can't save task answers. In Apps Script: Deploy, Manage deployments, pencil on the existing deployment, Version: New version, Deploy.";
+    else if(/^ignored/.test(txt)) m.textContent="Your script answered but ignored the row: its key doesn't match this page. Paste the whole collector file into Apps Script again, then Deploy, Manage deployments, edit, New version.";
     else if(/^error/.test(txt)) m.textContent="Your script answered with a problem: "+txt.slice(0,160);
     else m.textContent="Something answered, but not the collector script. Open the web app address in a new tab: it should say the collector is running. If it asks you to sign in, set access to Anyone and redeploy.";
   }).catch(()=>{ sheetSend([{kind:"event",participant:"TEST",t:new Date().toISOString(),task:"-",type:"connection_test",detail:{label:"Test row from the prototype (unconfirmed)"}}]);
@@ -636,14 +645,16 @@ $('#st-fb').addEventListener('submit',async e=>{
   const rec={kind:"feedback",participant:code,savedAt:new Date().toISOString(),set:T.set,task:k,taskTitle:T.title,site:$('#st-site').value,
     fixChosen:$('#fb-fix').value.trim(),ease:+val("fb-ease"),confidence:+val("fb-conf"),details:$('#fb-details').value.trim(),problems:$('#fb-problems').value.trim(),
     followQ:T.q,followA:$('#fb-follow').value.trim(),outcome:val("fb-out"),followCorrect:val("fb-fc")};
-  let where="local";
-  if(sheetUrl()&&sheetSend([rec])) where="sheet";
+  m.textContent="Saving…";
+  const sres=await sheetSendConfirmed([rec]);
+  let where=sres==="ok"?"sheet":"local";
   if(db){ try{ await db.collection("feedback").add(rec); if(where==="local") where="shared"; }catch(err){} }
   try{const a=JSON.parse(localStorage.getItem("bff-feedback")||"[]"); a.push(rec); localStorage.setItem("bff-feedback",JSON.stringify(a));}catch(err){}
-  log("task_feedback_saved",{label:T.title+" ("+rec.site+")"});
+  log("task_feedback_saved",{label:T.title+" ("+rec.site+")",sheet:sres});
+  if(sres!=="ok"&&sres!=="unconfirmed"&&sres!=="none"){ m.textContent=SHEET_MSG[sres]; return; }
   $('#st-fb').reset(); showTask();
   const i=TORDER.indexOf(k); if(i>=0&&i<TORDER.length-1){$('#st-task').value=TORDER[i+1]; showTask();}
-  m.textContent=(where==="sheet"?"Saved to the Task feedback tab.":where==="shared"?"Saved.":"Saved in this browser only.")+" Next task selected: "+TASKS[$('#st-task').value].title+".";
+  m.textContent=(sres==="ok"?SHEET_MSG.ok:sres==="unconfirmed"?SHEET_MSG.unconfirmed:where==="shared"?"Saved.":"Saved in this browser only.")+" Next task selected: "+TASKS[$('#st-task').value].title+".";
   $('#st-scen summary').focus();
 });
 $('#st-copy').addEventListener('click',()=>{const txt=JSON.stringify(session||{},null,1); const m=$('#st-copy-msg');
