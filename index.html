@@ -276,10 +276,6 @@ footer.foot{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)
     <div><label for="fb-details">What details helped you decide, and what did you wish you had?</label><textarea id="fb-details" style="min-height:4.5rem"></textarea></div>
     <div><label for="fb-problems">Any problems, challenges or other feedback?</label><textarea id="fb-problems" style="min-height:4.5rem"></textarea></div>
     <div><label for="fb-follow" id="fb-follow-l">Task question</label><textarea id="fb-follow" style="min-height:3.5rem"></textarea></div>
-    <fieldset><legend>For the researcher</legend>
-      <span class="lbl" id="fb-out-l">Outcome</span><div class="opts" role="radiogroup" aria-labelledby="fb-out-l" id="fb-out"></div>
-      <span class="lbl" id="fb-fc-l" style="margin-top:.6rem">Task question answered correctly?</span><div class="opts" role="radiogroup" aria-labelledby="fb-fc-l" id="fb-fc"></div>
-    </fieldset>
     <div class="row"><button type="submit" class="btn small">Save answers</button></div>
   </form>
   <p class="note">Nothing is sent until a participant code is entered. Answers go to the Task feedback tab. On the prototype, every search, suggestion picked, fix opened and form sent also goes to the Events tab.</p>
@@ -629,8 +625,6 @@ const TORDER=["W","A1","A2","A3","A4","A5","B1","B2","B3","B4","B5","A1-SR","B1-
 $('#st-task').innerHTML=`<option value="W">Warm-up</option><optgroup label="Set A">${["A1","A2","A3","A4","A5"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup><optgroup label="Set B">${["B1","B2","B3","B4","B5"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup><optgroup label="Screen-reader swap-ins">${["A1-SR","B1-SR"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup>`;
 function scale(id,name){$(id).innerHTML=[1,2,3,4,5].map(n=>`<label class="opt"><input type="radio" name="${name}" value="${n}" id="${name}-${n}"><span>${n}</span></label>`).join("")}
 scale('#fb-ease','fb-ease'); scale('#fb-conf','fb-conf');
-$('#fb-out').innerHTML=["Success","Wrong fix","Not found"].map((t,i)=>`<label class="opt"><input type="radio" name="fb-out" value="${t}" id="fb-out-${i}"><span>${t}</span></label>`).join("");
-$('#fb-fc').innerHTML=["Yes","Partly","No"].map((t,i)=>`<label class="opt"><input type="radio" name="fb-fc" value="${t}" id="fb-fc-${i}"><span>${t}</span></label>`).join("");
 function showTask(){const k=$('#st-task').value, T=TASKS[k]; $('#st-scen-text').textContent='"'+T.scen+'"'; $('#fb-follow-l').textContent=T.q;}
 $('#st-task').addEventListener('change',showTask); showTask();
 $('#st-start').addEventListener('click',()=>{const m=$('#st-copy-msg'); if(!$('#st-code').value.trim()){m.textContent="Enter a participant code first."; $('#st-code').focus(); return}
@@ -644,7 +638,7 @@ $('#st-fb').addEventListener('submit',async e=>{
   const k=$('#st-task').value, T=TASKS[k];
   const rec={kind:"feedback",participant:code,savedAt:new Date().toISOString(),set:T.set,task:k,taskTitle:T.title,site:$('#st-site').value,
     fixChosen:$('#fb-fix').value.trim(),ease:+val("fb-ease"),confidence:+val("fb-conf"),details:$('#fb-details').value.trim(),problems:$('#fb-problems').value.trim(),
-    followQ:T.q,followA:$('#fb-follow').value.trim(),outcome:val("fb-out"),followCorrect:val("fb-fc")};
+    followQ:T.q,followA:$('#fb-follow').value.trim();
   m.textContent="Saving…";
   const sres=await sheetSendConfirmed([rec]);
   let where=sres==="ok"?"sheet":"local";
