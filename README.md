@@ -1,2 +1,2 @@
 # gaming-accessibility
-Prototype research for finding accessibility solutions.
+<h1>Prototype research for finding accessibility solutions.</h1>
