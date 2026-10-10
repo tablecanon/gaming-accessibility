@@ -1,16 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Barrier Fix Finder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
 <style>
-html{color-scheme:light}body{margin:0}[hidden]{display:none!important}img{max-width:100%}
-
 /* Layout: one readable column, a settings-menu feel; versions and dates in mono, like patch notes. */
 :root{
   --bg:#EEF2F3; --surface:#FFFFFF; --surface-2:#F6F8F9; --ink:#13232B; --muted:#4B5D66; --line:#CBD6DB;
@@ -143,7 +136,7 @@ legend{font-weight:700;padding:0 .3rem}
 .err{color:var(--broken-fg);font-weight:700;margin-top:.4rem}
 .note{font-size:.92rem;color:var(--muted)}
 .studybar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20}
-#study{position:fixed;inset:auto 16px calc(16px + env(safe-area-inset-bottom,0px)) auto;width:min(26rem,calc(100% - 32px));max-height:80vh;overflow:auto;background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:1rem;z-index:30;box-shadow:0 14px 40px rgba(0,0,0,.25)}
+#study{position:fixed;inset:auto 16px calc(16px + env(safe-area-inset-bottom,0px)) auto;width:min(30rem,calc(100% - 32px));max-height:80vh;overflow:auto;background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:1rem;z-index:30;box-shadow:0 14px 40px rgba(0,0,0,.25)}
 #study h2{font-size:1.05rem}
 #study .row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
 #study ol{font-family:var(--mono);font-size:.8rem;padding-left:1.4rem;margin:.5rem 0;max-height:12rem;overflow:auto}
@@ -152,8 +145,6 @@ footer.foot{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)
 @media (prefers-reduced-motion:no-preference){.card,.fam,.chip{transition:border-color .15s}}
 </style>
 
-</head>
-<body>
 <a class="skip" href="#main">Skip to main content</a>
 <header class="top">
   <div class="wrap">
@@ -262,16 +253,27 @@ footer.foot{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)
   </details>
   <label for="st-code">Participant code</label>
   <input type="text" id="st-code" placeholder="e.g. P07" autocomplete="off">
-  <div class="row" style="align-items:end">
-    <div style="flex:1;min-width:8rem"><label for="st-task">Task</label><select id="st-task"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
-    <div><span class="lbl">Time on task</span><span class="timer" id="st-time" aria-live="off">0:00</span></div>
-  </div>
   <div class="row">
-    <button type="button" class="btn small" id="st-start">Start task</button>
-    <button type="button" class="btn small ghost" id="st-found">Found a fix</button>
-    <button type="button" class="btn small ghost" id="st-gave">Gave up</button>
+    <div style="flex:1;min-width:9rem"><label for="st-task">Task</label><select id="st-task"></select></div>
+    <div style="flex:1;min-width:9rem"><label for="st-site">Site used</label><select id="st-site"><option>Prototype</option><option>GamingAccessibility.org</option></select></div>
   </div>
-  <p class="note">Nothing is sent until a participant code is entered. From then on every search, suggestion picked, fix opened and form sent is logged and sent to the sheet a few seconds later.</p>
+  <details id="st-scen" open><summary>Scenario to read aloud</summary><p id="st-scen-text" style="margin:.5rem 0 0"></p></details>
+  <div class="row"><button type="button" class="btn small" id="st-start">Start task</button></div>
+  <form id="st-fb" class="stack" novalidate style="gap:.8rem;margin-top:.5rem">
+    <h3 style="margin:0">After the task</h3>
+    <div><label for="fb-fix">Which fix would you go with?</label><span class="hint">Its name, or "None".</span><input type="text" id="fb-fix" autocomplete="off"></div>
+    <fieldset><legend>How easy or hard was that?</legend><div class="opts" id="fb-ease"></div><p class="note" style="margin:.3rem 0 0">1 = very hard, 5 = very easy</p><div class="err" id="fb-ease-err" hidden></div></fieldset>
+    <fieldset><legend>How confident are you that this fix would work on your copy of the game?</legend><div class="opts" id="fb-conf"></div><p class="note" style="margin:.3rem 0 0">1 = not at all confident, 5 = completely confident</p><div class="err" id="fb-conf-err" hidden></div></fieldset>
+    <div><label for="fb-details">What details helped you decide, and what did you wish you had?</label><textarea id="fb-details" style="min-height:4.5rem"></textarea></div>
+    <div><label for="fb-problems">Any problems, challenges or other feedback?</label><textarea id="fb-problems" style="min-height:4.5rem"></textarea></div>
+    <div><label for="fb-follow" id="fb-follow-l">Task question</label><textarea id="fb-follow" style="min-height:3.5rem"></textarea></div>
+    <fieldset><legend>For the researcher</legend>
+      <span class="lbl" id="fb-out-l">Outcome</span><div class="opts" role="radiogroup" aria-labelledby="fb-out-l" id="fb-out"></div>
+      <span class="lbl" id="fb-fc-l" style="margin-top:.6rem">Task question answered correctly?</span><div class="opts" role="radiogroup" aria-labelledby="fb-fc-l" id="fb-fc"></div>
+    </fieldset>
+    <div class="row"><button type="submit" class="btn small">Save answers</button></div>
+  </form>
+  <p class="note">Nothing is sent until a participant code is entered. Answers go to the Task feedback tab. On the prototype, every search, suggestion picked, fix opened and form sent also goes to the Events tab.</p>
   <ol id="st-log" aria-label="Latest events"></ol>
   <div class="row"><button type="button" class="btn small ghost" id="st-copy">Copy this session's log</button><button type="button" class="btn small ghost" id="st-close">Close</button></div>
   <p class="note" id="st-copy-msg" role="status"></p>
@@ -590,13 +592,51 @@ $('#st-sheet-test').addEventListener('click',()=>{const m=$('#st-copy-msg'); if(
     m.textContent="Couldn't confirm the connection from this page. A test row was sent anyway: check the Events tab. If nothing appears, open the web app address in a new tab to see whether the script is running."; });
 });
 $('#st-close').addEventListener('click',()=>{sp.hidden=true; $('#study-open').setAttribute('aria-expanded','false'); $('#study-open').focus()});
-function fmt(ms){const s=Math.floor(ms/1000); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
-$('#st-start').addEventListener('click',()=>{if(!$('#st-code').value.trim()){$('#st-copy-msg').textContent="Enter a participant code first."; $('#st-code').focus(); return}
-  tStart=Date.now(); clearInterval(tick); tick=setInterval(()=>$('#st-time').textContent=fmt(Date.now()-tStart),500); log("task_start",{label:"Task "+$('#st-task').value}); $('#st-copy-msg').textContent="Task "+$('#st-task').value+" started.";});
-function endTask(kind){if(!tStart){$('#st-copy-msg').textContent="Start a task first."; return} const ms=Date.now()-tStart; clearInterval(tick); tStart=null;
-  log(kind,{label:"Task "+$('#st-task').value+" after "+fmt(ms),ms,fix:state.view==="fix"&&state.fix?state.fix.id:null}); $('#st-copy-msg').textContent="Task "+$('#st-task').value+" ended: "+(kind==="task_found"?"found a fix":"gave up")+" after "+fmt(ms)+"."; saveSession();}
-$('#st-found').addEventListener('click',()=>endTask("task_found"));
-$('#st-gave').addEventListener('click',()=>endTask("task_gave_up"));
+const TASKS={
+ "W":{set:"Warm-up",title:"Warm-up (not scored)",scen:"You play Cyberpunk 2077 and the subtitles are too small to read. Have a look around and find something that would help. Please think aloud as you go.",q:"What did you find?"},
+ "A1":{set:"A",title:"A1. Camera bob in Skyrim",scen:"You play Skyrim Special Edition on Steam, updated to the latest version. The camera bobbing when you run makes you feel sick. Find a fix you would install.",q:"Will it work on your version of the game? How do you know?"},
+ "A2":{set:"A",title:"A2. Spiders in Skyrim",scen:"Spiders in Skyrim are a dealbreaker for you. Find a mod that removes them without breaking the main story.",q:"Is there anything you'd want to know before installing it?"},
+ "A3":{set:"A",title:"A3. Pausing in Elden Ring",scen:"You need to be able to pause Elden Ring at any moment. Find a way to do that.",q:"Could you still play online with friends while using it?"},
+ "A4":{set:"A",title:"A4. Hacking timer in Cyberpunk 2077",scen:"The hacking puzzle in Cyberpunk 2077 has a timer that's too fast for you. Find the easiest fix.",q:"What would you need to install?"},
+ "A5":{set:"A",title:"A5. Sound cues in Elden Ring",scen:"You're deaf. In Elden Ring you can't tell when an enemy is behind you, because the only warning is a sound. Find a fix. If there isn't one, let the site know what you need.",q:"How sure are you that no fix exists?"},
+ "B1":{set:"B",title:"B1. Camera bob in The Witcher 3",scen:"You play The Witcher 3 on Steam, updated to the latest version (the Remastered update). The camera bobbing when you run makes you feel sick. Find a fix you would install.",q:"Will it work on your version of the game? How do you know?"},
+ "B2":{set:"B",title:"B2. Bird and cricket sounds in Skyrim",scen:"Bird and cricket sounds in Skyrim distress you. Find a mod to silence them that's safe to download.",q:"Is there anything you'd want to know before installing it?"},
+ "B3":{set:"B",title:"B3. Holding to sprint in Elden Ring",scen:"Holding the button to sprint in Elden Ring hurts your hand. Find a fix.",q:"Could you still play online with friends while using it?"},
+ "B4":{set:"B",title:"B4. Holding Witcher Senses in The Witcher 3",scen:"In The Witcher 3 (latest version), holding down a button to use Witcher Senses hurts your hand. Find the easiest fix.",q:"What would you need to install?"},
+ "B5":{set:"B",title:"B5. Screen reader in The Witcher 3",scen:"You use a screen reader and want to play The Witcher 3. Find a fix. If there isn't one, let the site know what you need.",q:"How sure are you that no fix exists?"},
+ "A1-SR":{set:"A",title:"A1-SR. Stardew Valley with a screen reader",scen:"You use NVDA and want to play Stardew Valley. Find what you need, and everything else you'd have to install first.",q:"What else would you have to install first?"},
+ "B1-SR":{set:"B",title:"B1-SR. Fallout 4 with a screen reader",scen:"You use NVDA and want to play Fallout 4 on Steam, latest version. Find what you need, and everything else you'd have to install first.",q:"What else would you have to install first? Will it work on your version?"}
+};
+const TORDER=["W","A1","A2","A3","A4","A5","B1","B2","B3","B4","B5","A1-SR","B1-SR"];
+$('#st-task').innerHTML=`<option value="W">Warm-up</option><optgroup label="Set A">${["A1","A2","A3","A4","A5"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup><optgroup label="Set B">${["B1","B2","B3","B4","B5"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup><optgroup label="Screen-reader swap-ins">${["A1-SR","B1-SR"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup>`;
+function scale(id,name){$(id).innerHTML=[1,2,3,4,5].map(n=>`<label class="opt"><input type="radio" name="${name}" value="${n}" id="${name}-${n}"><span>${n}</span></label>`).join("")}
+scale('#fb-ease','fb-ease'); scale('#fb-conf','fb-conf');
+$('#fb-out').innerHTML=["Success","Wrong fix","Not found"].map((t,i)=>`<label class="opt"><input type="radio" name="fb-out" value="${t}" id="fb-out-${i}"><span>${t}</span></label>`).join("");
+$('#fb-fc').innerHTML=["Yes","Partly","No"].map((t,i)=>`<label class="opt"><input type="radio" name="fb-fc" value="${t}" id="fb-fc-${i}"><span>${t}</span></label>`).join("");
+function showTask(){const k=$('#st-task').value, T=TASKS[k]; $('#st-scen-text').textContent='"'+T.scen+'"'; $('#fb-follow-l').textContent=T.q;}
+$('#st-task').addEventListener('change',showTask); showTask();
+$('#st-start').addEventListener('click',()=>{const m=$('#st-copy-msg'); if(!$('#st-code').value.trim()){m.textContent="Enter a participant code first."; $('#st-code').focus(); return}
+  log("task_start",{label:TASKS[$('#st-task').value].title+" on "+$('#st-site').value,site:$('#st-site').value}); m.textContent=TASKS[$('#st-task').value].title+" started on "+$('#st-site').value+".";});
+$('#st-fb').addEventListener('submit',async e=>{
+  e.preventDefault(); const m=$('#st-copy-msg'); const code=$('#st-code').value.trim();
+  if(!code){m.textContent="Enter a participant code first."; $('#st-code').focus(); return}
+  let ok=true;
+  for(const n of ["fb-ease","fb-conf"]){const er=$('#'+n+'-err'); if(!val(n)){er.hidden=false; er.textContent="Pick a number from 1 to 5."; ok=false} else er.hidden=true}
+  if(!ok){const f=document.querySelector('#st-fb .err:not([hidden])'); f.closest('fieldset').querySelector('input').focus(); m.textContent="Two answers are missing."; return}
+  const k=$('#st-task').value, T=TASKS[k];
+  const rec={kind:"feedback",participant:code,savedAt:new Date().toISOString(),set:T.set,task:k,taskTitle:T.title,site:$('#st-site').value,
+    fixChosen:$('#fb-fix').value.trim(),ease:+val("fb-ease"),confidence:+val("fb-conf"),details:$('#fb-details').value.trim(),problems:$('#fb-problems').value.trim(),
+    followQ:T.q,followA:$('#fb-follow').value.trim(),outcome:val("fb-out"),followCorrect:val("fb-fc")};
+  let where="local";
+  if(sheetUrl()&&sheetSend([rec])) where="sheet";
+  if(db){ try{ await db.collection("feedback").add(rec); if(where==="local") where="shared"; }catch(err){} }
+  try{const a=JSON.parse(localStorage.getItem("bff-feedback")||"[]"); a.push(rec); localStorage.setItem("bff-feedback",JSON.stringify(a));}catch(err){}
+  log("task_feedback_saved",{label:T.title+" ("+rec.site+")"});
+  $('#st-fb').reset(); showTask();
+  const i=TORDER.indexOf(k); if(i>=0&&i<TORDER.length-1){$('#st-task').value=TORDER[i+1]; showTask();}
+  m.textContent=(where==="sheet"?"Saved to the Task feedback tab.":where==="shared"?"Saved.":"Saved in this browser only.")+" Next task selected: "+TASKS[$('#st-task').value].title+".";
+  $('#st-scen summary').focus();
+});
 $('#st-copy').addEventListener('click',()=>{const txt=JSON.stringify(session||{},null,1); const m=$('#st-copy-msg');
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>m.textContent="Copied.",()=>m.textContent="Copy didn't work here. The log is also kept in this browser.")} else m.textContent="Copy isn't available here.";});
 
@@ -604,5 +644,4 @@ for(const v of ["results","fix","report","request","done"]) document.getElementB
 })();
 </script>
 
-</body>
-</html>
+</body></html>
