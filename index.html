@@ -638,7 +638,7 @@ $('#st-fb').addEventListener('submit',async e=>{
   const k=$('#st-task').value, T=TASKS[k];
   const rec={kind:"feedback",participant:code,savedAt:new Date().toISOString(),set:T.set,task:k,taskTitle:T.title,site:$('#st-site').value,
     fixChosen:$('#fb-fix').value.trim(),ease:+val("fb-ease"),confidence:+val("fb-conf"),details:$('#fb-details').value.trim(),problems:$('#fb-problems').value.trim(),
-    followQ:T.q,followA:$('#fb-follow').value.trim();
+    followQ:T.q,followA:$('#fb-follow').value.trim()};
   m.textContent="Saving…";
   const sres=await sheetSendConfirmed([rec]);
   let where=sres==="ok"?"sheet":"local";
