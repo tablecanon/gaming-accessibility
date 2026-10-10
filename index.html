@@ -271,7 +271,7 @@ footer.foot{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)
     <button type="button" class="btn small ghost" id="st-found">Found a fix</button>
     <button type="button" class="btn small ghost" id="st-gave">Gave up</button>
   </div>
-  <p class="note">Every search, suggestion picked, fix opened and form sent is logged with a timestamp while a code is set.</p>
+  <p class="note">Nothing is sent until a participant code is entered. From then on every search, suggestion picked, fix opened and form sent is logged and sent to the sheet a few seconds later.</p>
   <ol id="st-log" aria-label="Latest events"></ol>
   <div class="row"><button type="button" class="btn small ghost" id="st-copy">Copy this session's log</button><button type="button" class="btn small ghost" id="st-close">Close</button></div>
   <p class="note" id="st-copy-msg" role="status"></p>
@@ -578,7 +578,17 @@ $('#st-sheet-save').addEventListener('click',()=>{const v=$('#st-sheet').value.t
   try{ if(v) localStorage.setItem("bff-sheet",v); else localStorage.removeItem("bff-sheet"); m.textContent=v?"Saved. New results go to your sheet.":"Removed."; }catch(e){ m.textContent="This browser won't remember it. Ask Claude to build the address into the page instead."; }
   storeMsg();});
 $('#st-sheet-test').addEventListener('click',()=>{const m=$('#st-copy-msg'); if(!sheetUrl()){m.textContent="Save a web app address first."; return}
-  sheetSend([{kind:"event",participant:"TEST",t:new Date().toISOString(),task:"-",type:"connection_test",detail:{label:"Test row from the prototype"}}]); m.textContent="Test row sent. Check the Events tab of your sheet in a few seconds.";});
+  m.textContent="Sending a test row…";
+  const body=JSON.stringify({key:SHEET_KEY,items:[{kind:"event",participant:"TEST",t:new Date().toISOString(),task:"-",type:"connection_test",detail:{label:"Test row from the prototype"}}]});
+  fetch(sheetUrl(),{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body}).then(r=>r.text()).then(txt=>{
+    txt=(txt||"").trim();
+    if(txt==="ok") m.textContent="Connected. A test row was added to the Events tab at the bottom of your sheet.";
+    else if(txt==="ignored") m.textContent="Your script answered but ignored the row: its key doesn't match this page. Paste the whole collector file into Apps Script again, then Deploy, Manage deployments, edit, New version.";
+    else if(/^error/.test(txt)) m.textContent="Your script answered with a problem: "+txt.slice(0,160);
+    else m.textContent="Something answered, but not the collector script. Open the web app address in a new tab: it should say the collector is running. If it asks you to sign in, set access to Anyone and redeploy.";
+  }).catch(()=>{ sheetSend([{kind:"event",participant:"TEST",t:new Date().toISOString(),task:"-",type:"connection_test",detail:{label:"Test row from the prototype (unconfirmed)"}}]);
+    m.textContent="Couldn't confirm the connection from this page. A test row was sent anyway: check the Events tab. If nothing appears, open the web app address in a new tab to see whether the script is running."; });
+});
 $('#st-close').addEventListener('click',()=>{sp.hidden=true; $('#study-open').setAttribute('aria-expanded','false'); $('#study-open').focus()});
 function fmt(ms){const s=Math.floor(ms/1000); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
 $('#st-start').addEventListener('click',()=>{if(!$('#st-code').value.trim()){$('#st-copy-msg').textContent="Enter a participant code first."; $('#st-code').focus(); return}
