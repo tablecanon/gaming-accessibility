@@ -599,7 +599,7 @@ const TORDER=["W","A1","A2","A3","A4","A5","B1","B2","B3","B4","B5","A1-SR","B1-
 $('#st-task').innerHTML=`<option value="W">Warm-up</option><optgroup label="Set A">${["A1","A2","A3","A4","A5"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup><optgroup label="Set B">${["B1","B2","B3","B4","B5"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup><optgroup label="Screen-reader swap-ins">${["A1-SR","B1-SR"].map(k=>`<option value="${k}">${esc(TASKS[k].title)}</option>`).join("")}</optgroup>`;
 function scale(id,name){$(id).innerHTML=[1,2,3,4,5].map(n=>`<label class="opt"><input type="radio" name="${name}" value="${n}" id="${name}-${n}"><span>${n}</span></label>`).join("")}
 scale('#fb-ease','fb-ease'); scale('#fb-conf','fb-conf');
-function showTask(){const k=$('#st-task').value, T=TASKS[k]; $('#st-scen-text').textContent='"'+T.scen+'"'; $('#fb-follow-l').textContent=T.q;}
+function showTask(){const k=$('#st-task').value, T=TASKS[k]; $('#st-scen-text').textContent=T.scen; $('#fb-follow-l').textContent=T.q;}
 $('#st-task').addEventListener('change',showTask); showTask();
 $('#st-fb').addEventListener('submit',async e=>{
   e.preventDefault(); const m=$('#st-copy-msg'); const code=$('#st-code').value.trim();
