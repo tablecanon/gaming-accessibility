@@ -142,11 +142,11 @@ legend{font-weight:700;padding:0 .3rem}
 .opt input:focus-visible + span{outline:3px solid var(--focus);outline-offset:2px}
 .err{color:var(--broken-fg);font-weight:700;margin-top:.4rem}
 .note{font-size:.92rem;color:var(--muted)}
-.studybar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20}
-#study{position:fixed;inset:auto 16px calc(16px + env(safe-area-inset-bottom,0px)) auto;width:min(30rem,calc(100% - 32px));max-height:80vh;overflow:auto;background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:1rem;z-index:30;box-shadow:0 14px 40px rgba(0,0,0,.25)}
-#study h2{font-size:1.05rem}
-#study .row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
-#study ol{font-family:var(--mono);font-size:.8rem;padding-left:1.4rem;margin:.5rem 0;max-height:12rem;overflow:auto}
+.prototypebar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20}
+#prototype{position:fixed;inset:auto 16px calc(16px + env(safe-area-inset-bottom,0px)) auto;width:min(30rem,calc(100% - 32px));max-height:80vh;overflow:auto;background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:1rem;z-index:30;box-shadow:0 14px 40px rgba(0,0,0,.25)}
+#prototype h2{font-size:1.05rem}
+#prototype .row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+#prototype ol{font-family:var(--mono);font-size:.8rem;padding-left:1.4rem;margin:.5rem 0;max-height:12rem;overflow:auto}
 .timer{font-family:var(--mono);font-size:1.4rem;font-variant-numeric:tabular-nums}
 footer.foot{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line);padding-block:1.25rem}
 @media (prefers-reduced-motion:no-preference){.card,.fam,.chip{transition:border-color .15s}}
@@ -302,9 +302,9 @@ const FACETFIX={"Spiders":/spider|arachn|spooder/i,"Insects and bugs":/insect|ch
  "Eating and drinking":/eat|drink|mouth|chew/i,"Insects and birds (ambient)":/bird|cricket|cicada|insect|nature/i,"Heartbeat and low-health warnings":/heartbeat/i,"Menu and UI sounds":/\bUI\b|menu/i};
 let state={view:"search",barrier:null,facet:null,game:"",fix:null,prev:"search",query:""};
 
-/* ---------- Study log ---------- */
+/* ---------- Prototype log ---------- */
 let db=null, session=null, saveTimer=null, saving=false, tStart=null, tick=null;
-const localKey="bff-study-log";
+const localKey="bff-prototype-log";
 /* Google Sheets: paste the web app address between the quotes to build it into the page for everyone. */
 const SHEET_ENDPOINT_BUILTIN="https://script.google.com/macros/s/AKfycbyWicckkhi7OwE2pslfgPJq7Y6zL-kn0-bPFX5qES1bT5wZ27jZXLbtkxGKDwfy4dzM/exec";
 const SHEET_KEY="bff-08060f54403c";
@@ -341,7 +341,7 @@ function log(type,detail){
 async function saveSession(){
   if(!db||!session||saving) return; saving=true;
   try{ await db.collection("sessions").doc(session.code.replace(/[^A-Za-z0-9_\-.~:@+]/g,"_")).set({code:session.code,started:session.started,updated:now(),events:session.events});}
-  catch(e){ $('#st-store').textContent="Couldn't save to the shared study log ("+(e&&e.code||"error")+"). The log is kept in this browser; use Copy."; }
+  catch(e){ $('#st-store').textContent="Couldn't save to the shared prototype log ("+(e&&e.code||"error")+"). The log is kept in this browser; use Copy."; }
   finally{saving=false}
 }
 async function saveRecord(kind,rec){
@@ -575,11 +575,11 @@ function setScale(s){document.documentElement.style.setProperty('--scale',s); do
 document.querySelectorAll('[data-scale]').forEach(b=>b.addEventListener('click',()=>setScale(b.dataset.scale)));
 try{const s=localStorage.getItem('bff-scale'); if(s) setScale(s)}catch(e){}
 
-/* ---------- Study panel ---------- */
-const sp=$('#study');
-$('#study-open').addEventListener('click',()=>{sp.hidden=!sp.hidden; $('#study-open').setAttribute('aria-expanded',String(!sp.hidden)); if(!sp.hidden) $('#st-code').focus()});
+/* ---------- Prototype panel ---------- */
+const sp=$('#prototype');
+$('#prototype-open').addEventListener('click',()=>{sp.hidden=!sp.hidden; $('#prototype-open').setAttribute('aria-expanded',String(!sp.hidden)); if(!sp.hidden) $('#st-code').focus()});
 storeMsg();
-$('#st-close').addEventListener('click',()=>{sp.hidden=true; $('#study-open').setAttribute('aria-expanded','false'); $('#study-open').focus()});
+$('#st-close').addEventListener('click',()=>{sp.hidden=true; $('#prototype-open').setAttribute('aria-expanded','false'); $('#prototype-open').focus()});
 const TASKS={
  "W":{set:"Warm-up",title:"Warm-up (not scored)",scen:"You play Cyberpunk 2077 and the subtitles are too small to read. Have a look around and find something that would help. Please think aloud as you go.",q:"What did you find?"},
  "A1":{set:"A",title:"A1. Camera bob in Skyrim",scen:"You play Skyrim Special Edition on Steam, updated to the latest version. The camera bobbing when you run makes you feel sick. Find a fix you would install.",q:"Will it work on your version of the game? How do you know?"},
